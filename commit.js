@@ -29,6 +29,9 @@ function writecommit() {
       return index.addByPath(screenshotName);
     })
     .then(function() {
+      return index.addAll();
+    })
+    .then(function() {
       // this will write both files to the index
       return index.write();
     })
