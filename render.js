@@ -8,20 +8,30 @@ let nodegit = require("nodegit"),
 let { screenshotName } = require("./commit.js");
 let directoryName = process.cwd();
 
-function findFile(commit) {
-  commit
-    .getTree()
-    .then(function(tree) {
-      // `walk()` returns an event.
-      var walker = tree.walk();
-      walker.on("entry", function(entry) {
-        console.log(entry.path());
-      });
 
-      // Don't forget to call `start()`!
-      walker.start();
+function findFile(sha) {
+  let _entry;
+  nodegit.Repository
+    .open(path.resolve(directoryName, ".git"))
+    .then(function(repo) {
+      return repo.getCommit(sha);
     })
-    .done();
+    .then((commit) => {
+      return commit.getEntry(screenshotName);
+    })
+    .then((entry) => {
+      _entry = entry;
+      return _entry.getBlob();
+    })
+    .then((blob) => {
+      console.log(_entry.name(), _entry.sha(), blob.rawsize() + "b");
+      console.log(
+        "========================================================\n\n"
+      );
+      var firstTenLines = blob.toString().split("\n").slice(0, 10).join("\n");
+      console.log(firstTenLines);
+      console.log("...");
+    });
 }
 
 // This code walks the history of the master branch and prints results
@@ -59,9 +69,10 @@ nodegit.Repository
   })
   .then(function(firstCommitOnMaster) {
     console.log(firstCommitOnMaster);
-    firstCommitOnMaster.nthGenAncestor(2).then(function(commit) {
-      console.log(commit);
+    findFile(firstCommitOnMaster);
 
+    firstCommitOnMaster.nthGenAncestor(3).then(function(commit) {
+      console.log(commit.message());
       findFile(commit);
     });
     // History returns an event.
@@ -70,19 +81,16 @@ nodegit.Repository
     walker.sorting(nodegit.Revwalk.SORT.Time);
     return walker.fileHistoryWalk(screenshotName, 500);
   })
-  .then(compileHistory)
-  .then(function() {
-    historyCommits.forEach(function(entry) {
-      //   console.log(entry);
-      commit = entry.commit;
+    .then(compileHistory)
+    .then(function() {
+      historyCommits.forEach(function(entry) {
+        //   console.log(entry);
+        commit = entry.commit;
 
-      console.log("commit " + commit.sha());
-      //   console.log(
-      // "Author:",
-      // commit.author().name() + " <" + commit.author().email() + ">"
-      //   );
-      console.log("Date:", commit.date());
-      console.log(commit.message());
-    });
-  })
+        console.log("commit " + commit.sha());
+        findFile(commit.sha())
+        console.log("Date:", commit.date());
+        console.log(commit.message());
+      });
+    })
   .done();
