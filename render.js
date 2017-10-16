@@ -8,15 +8,16 @@ let nodegit = require("nodegit"),
 let { screenshotName } = require("./commit.js");
 let directoryName = process.cwd();
 
-
-function findFile(commit){
-     commit.getTree().then(function(tree) {
+function findFile(commit) {
+  commit
+    .getTree()
+    .then(function(tree) {
       // `walk()` returns an event.
       var walker = tree.walk();
       walker.on("entry", function(entry) {
         console.log(entry.path());
       });
-  
+
       // Don't forget to call `start()`!
       walker.start();
     })
@@ -39,7 +40,6 @@ function compileHistory(resultingArrayOfCommits) {
   }
 
   resultingArrayOfCommits.forEach(function(entry) {
-      console.log(entry.commit)
     historyCommits.push(entry);
   });
   lastSha = historyCommits[historyCommits.length - 1].commit.sha();
@@ -58,7 +58,12 @@ nodegit.Repository
     return repo.getMasterCommit();
   })
   .then(function(firstCommitOnMaster) {
-    console.log(firstCommitOnMaster)
+    console.log(firstCommitOnMaster);
+    firstCommitOnMaster.nthGenAncestor(2).then(function(commit) {
+      console.log(commit);
+
+      findFile(commit);
+    });
     // History returns an event.
     walker = repo.createRevWalk();
     walker.push(firstCommitOnMaster.sha());
@@ -68,15 +73,14 @@ nodegit.Repository
   .then(compileHistory)
   .then(function() {
     historyCommits.forEach(function(entry) {
-    //   console.log(entry);
+      //   console.log(entry);
       commit = entry.commit;
-      
-      
+
       console.log("commit " + commit.sha());
-    //   console.log(
-        // "Author:",
-        // commit.author().name() + " <" + commit.author().email() + ">"
-    //   );
+      //   console.log(
+      // "Author:",
+      // commit.author().name() + " <" + commit.author().email() + ">"
+      //   );
       console.log("Date:", commit.date());
       console.log(commit.message());
     });
