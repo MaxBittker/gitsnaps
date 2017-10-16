@@ -61,4 +61,4 @@ function writecommit() {
     });
 }
 
-module.exports = { writecommit, screenshotLocation };
+module.exports = { writecommit, screenshotLocation, screenshotName };
