@@ -1,5 +1,7 @@
 let nodegit = require("nodegit"),
   path = require("path"),
+  fs = require("fs"),
+  os = require('os'),
   walker,
   historyCommits = [],
   commit,
@@ -7,7 +9,23 @@ let nodegit = require("nodegit"),
 
 let { screenshotName } = require("./commit.js");
 let directoryName = process.cwd();
+let tempDirName =  fs.mkdtempSync(
+  path.join(os.tmpdir(), '/')
+  +'gitsnaps-'+path.parse(directoryName).base)
 
+  console.log(tempDirName)
+
+function buildPage(){
+
+}
+
+let a = 0;
+
+function saveFile(blob){
+  a++
+  name = 'snap-'+a+'.png';
+  fs.writeFileSync(tempDirName+'/'+name,  blob.content());
+}
 
 function findFile(sha) {
   let _entry;
@@ -25,12 +43,7 @@ function findFile(sha) {
     })
     .then((blob) => {
       console.log(_entry.name(), _entry.sha(), blob.rawsize() + "b");
-      console.log(
-        "========================================================\n\n"
-      );
-      var firstTenLines = blob.toString().split("\n").slice(0, 10).join("\n");
-      console.log(firstTenLines);
-      console.log("...");
+      saveFile(blob)
     });
 }
 
@@ -87,10 +100,10 @@ nodegit.Repository
         //   console.log(entry);
         commit = entry.commit;
 
-        console.log("commit " + commit.sha());
+        // console.log("commit " + commit.sha());
         findFile(commit.sha())
-        console.log("Date:", commit.date());
-        console.log(commit.message());
+        // console.log("Date:", commit.date());
+        // console.log(commit.message());
       });
     })
   .done();
