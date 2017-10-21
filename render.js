@@ -8,22 +8,22 @@ let nodegit = require("nodegit"),
   repo;
 
 let { screenshotName } = require("./commit.js");
+
 let directoryName = process.cwd();
+
 let tempDirName =  fs.mkdtempSync(
   path.join(os.tmpdir(), '/')
   +'gitsnaps-'+path.parse(directoryName).base)
 
   console.log(tempDirName)
 
-function buildPage(){
-
+function buildPage(commitList){
+  
 }
 
-let a = 0;
 
-function saveFile(blob){
-  a++
-  name = 'snap-'+a+'.png';
+function saveFile(blob, sha){
+  name = 'snap-'+sha+'.png';
   fs.writeFileSync(tempDirName+'/'+name,  blob.content());
 }
 
@@ -42,8 +42,9 @@ function findFile(sha) {
       return _entry.getBlob();
     })
     .then((blob) => {
-      console.log(_entry.name(), _entry.sha(), blob.rawsize() + "b");
-      saveFile(blob)
+      // console.log(_entry.name(), _entry.sha(), blob.rawsize() + "b");
+      saveFile(blob ,_entry.sha())
+      
     });
 }
 
