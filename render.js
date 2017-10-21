@@ -1,7 +1,7 @@
 let nodegit = require("nodegit"),
   path = require("path"),
   fs = require("fs"),
-  os = require('os'),
+  os = require("os"),
   walker,
   historyCommits = [],
   commit,
@@ -11,20 +11,31 @@ let { screenshotName } = require("./commit.js");
 
 let directoryName = process.cwd();
 
-let tempDirName =  fs.mkdtempSync(
-  path.join(os.tmpdir(), '/')
-  +'gitsnaps-'+path.parse(directoryName).base)
+let tempDirName = fs.mkdtempSync(
+  path.join(os.tmpdir(), "/") + "gitsnaps-" + path.parse(directoryName).base
+);
 
-  console.log(tempDirName)
+console.log(tempDirName);
 
-function buildPage(commitList){
-  
+function buildName(sha) {
+  let name = "snap-" + sha + ".png";
+  return tempDirName + "/" + name;
 }
 
+function buildPage(commitList) {
+  return commitList
+    .map(entry => {
+      let sha = entry.commit.sha();
+      return `<div>
+    <h2>${sha}</h2>
+    <img src="file:///private${buildName(sha)}"/>
+</div>`;
+    })
+    .join("\n");
+}
 
-function saveFile(blob, sha){
-  name = 'snap-'+sha+'.png';
-  fs.writeFileSync(tempDirName+'/'+name,  blob.content());
+function saveFile(blob, sha) {
+  fs.writeFileSync(buildName(sha), blob.content());
 }
 
 function findFile(sha) {
@@ -34,17 +45,16 @@ function findFile(sha) {
     .then(function(repo) {
       return repo.getCommit(sha);
     })
-    .then((commit) => {
+    .then(commit => {
       return commit.getEntry(screenshotName);
     })
-    .then((entry) => {
+    .then(entry => {
       _entry = entry;
       return _entry.getBlob();
     })
-    .then((blob) => {
+    .then(blob => {
       // console.log(_entry.name(), _entry.sha(), blob.rawsize() + "b");
-      saveFile(blob ,_entry.sha())
-      
+      saveFile(blob, _entry.sha());
     });
 }
 
@@ -82,29 +92,30 @@ nodegit.Repository
     return repo.getMasterCommit();
   })
   .then(function(firstCommitOnMaster) {
-    console.log(firstCommitOnMaster);
-    findFile(firstCommitOnMaster);
+    // console.log(firstCommitOnMaster);
+    // findFile(firstCommitOnMaster);
 
-    firstCommitOnMaster.nthGenAncestor(3).then(function(commit) {
-      console.log(commit.message());
-      findFile(commit);
-    });
+    // firstCommitOnMaster.nthGenAncestor(3).then(function(commit) {
+    //   console.log(commit.message());
+    //   findFile(commit);
+    // });
     // History returns an event.
     walker = repo.createRevWalk();
     walker.push(firstCommitOnMaster.sha());
     walker.sorting(nodegit.Revwalk.SORT.Time);
     return walker.fileHistoryWalk(screenshotName, 500);
   })
-    .then(compileHistory)
-    .then(function() {
-      historyCommits.forEach(function(entry) {
-        //   console.log(entry);
-        commit = entry.commit;
-
-        // console.log("commit " + commit.sha());
-        findFile(commit.sha())
-        // console.log("Date:", commit.date());
-        // console.log(commit.message());
-      });
-    })
+  .then(compileHistory)
+  .then(function() {
+    historyCommits.forEach(function(entry) {
+      //   console.log(entry);
+      commit = entry.commit;
+      // console.log("commit " + commit.sha());
+      findFile(commit.sha());
+      // console.log("Date:", commit.date());
+      // console.log(commit.message());
+    });
+    let page = buildPage(historyCommits);
+    console.log(page);
+  })
   .done();
