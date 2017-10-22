@@ -35,17 +35,20 @@ function buildPage(commitList) {
 }
 
 function saveFile(blob, sha) {
+  console.log(buildName(sha))
   fs.writeFileSync(buildName(sha), blob.content());
 }
 
 function findFile(sha) {
   let _entry;
+  let _commit;
   nodegit.Repository
     .open(path.resolve(directoryName, ".git"))
     .then(function(repo) {
       return repo.getCommit(sha);
     })
     .then(commit => {
+      _commit = commit;
       return commit.getEntry(screenshotName);
     })
     .then(entry => {
@@ -54,7 +57,7 @@ function findFile(sha) {
     })
     .then(blob => {
       // console.log(_entry.name(), _entry.sha(), blob.rawsize() + "b");
-      saveFile(blob, _entry.sha());
+      saveFile(blob, _commit.sha());
     });
 }
 
@@ -117,5 +120,6 @@ nodegit.Repository
     });
     let page = buildPage(historyCommits);
     console.log(page);
+    fs.writeFileSync('index.html', page);
   })
   .done();
