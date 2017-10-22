@@ -1,0 +1,21 @@
+.content{
+    max-width: 600px;
+    margin: auto;
+}
+
+.snap{
+    border: 1px solid black;
+    margin-bottom: 3px;
+}
+
+pre{
+    margin-left: 20px;
+    text-decoration-line: underline;
+    text-decoration-style: wavy;
+    text-decoration-color: gainsboro;
+}
+
+img{
+    max-width: 300px;
+}
+

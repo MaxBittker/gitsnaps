@@ -23,15 +23,24 @@ function buildName(sha) {
 }
 
 function buildPage(commitList) {
-  return commitList
+  let body = commitList
     .map(entry => {
       let sha = entry.commit.sha();
-      return `<div>
-    <h2>${sha}</h2>
-    <img src="file:///private${buildName(sha)}"/>
+      return `<div class="snap">
+      <img src="file:///private${buildName(sha)}"/>
+      <pre>${sha}</pre>
 </div>`;
     })
     .join("\n");
+
+  return `<html>
+  <head>
+  <link rel="stylesheet" type="text/css" href="main.css" />
+  </head><body>
+  <div class="content">
+  ${body}
+  </div>
+  </body></html>`;
 }
 
 function saveFile(blob, sha) {
