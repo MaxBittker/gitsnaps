@@ -1,4 +1,4 @@
-.content{
+module.exports = `.content{
     max-width: 600px;
     margin: auto;
 }
@@ -19,3 +19,4 @@ img{
     max-width: 300px;
 }
 
+`

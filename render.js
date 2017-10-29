@@ -8,7 +8,7 @@ let nodegit = require("nodegit"),
   repo;
 
 let { screenshotName } = require("./commit.js");
-
+let styles = require('./main.css.js');
 let directoryName = process.cwd();
 
 let tempDirName = fs.mkdtempSync(
@@ -35,7 +35,7 @@ function buildPage(commitList) {
 
   return `<html>
   <head>
-  <link rel="stylesheet" type="text/css" href="main.css" />
+  <style>${styles}</style>
   </head><body>
   <div class="content">
   ${body}
@@ -101,20 +101,13 @@ nodegit.Repository
   .open(path.resolve(directoryName, ".git"))
   .then(function(r) {
     repo = r;
-    return repo.getMasterCommit();
+    return repo.getHeadCommit();
   })
   .then(function(firstCommitOnMaster) {
-    // console.log(firstCommitOnMaster);
-    // findFile(firstCommitOnMaster);
-
-    // firstCommitOnMaster.nthGenAncestor(3).then(function(commit) {
-    //   console.log(commit.message());
-    //   findFile(commit);
-    // });
-    // History returns an event.
     walker = repo.createRevWalk();
     walker.push(firstCommitOnMaster.sha());
     walker.sorting(nodegit.Revwalk.SORT.Time);
+    
     return walker.fileHistoryWalk(screenshotName, 500);
   })
   .then(compileHistory)
