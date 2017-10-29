@@ -1,3 +1,5 @@
+#!/usr/local/bin/node
+
 let nodegit = require("nodegit"),
   path = require("path"),
   fs = require("fs"),
