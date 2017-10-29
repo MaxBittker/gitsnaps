@@ -1,11 +1,17 @@
 module.exports = `.content{
-    max-width: 600px;
+    max-width: 1400px;
+    display: flex;
+    flex-wrap: wrap;
     margin: auto;
+    padding: 20px;
 }
 
 .snap{
     border: 1px solid black;
-    margin-bottom: 3px;
+    margin: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 pre{
@@ -16,7 +22,7 @@ pre{
 }
 
 img{
-    max-width: 300px;
+    max-width: 350px;
 }
 
 `
