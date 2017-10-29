@@ -4,7 +4,6 @@ let nodegit = require("nodegit"),
   os = require("os"),
   exec = require("child_process").exec,
   walker,
-  historyCommits = [],
   commit,
   repo;
 
@@ -24,6 +23,7 @@ function buildName(sha) {
 }
 
 function buildPage(commitList) {
+  console.log("building page", commitList.length);
   let body = commitList
     .map(entry => {
       let sha = entry.commit.sha();
@@ -34,10 +34,10 @@ function buildPage(commitList) {
     })
     .join("\n");
 
-  return `<html>
-  <head>
+  return `<html><head>
   <style>${styles}</style>
-  </head><body>
+  </head>
+  <body>
   <div class="content">
   ${body}
   </div>
@@ -45,7 +45,6 @@ function buildPage(commitList) {
 }
 
 function saveFile(blob, sha) {
-  // console.log(buildName(sha));
   fs.writeFileSync(buildName(sha), blob.content());
 }
 
@@ -71,55 +70,32 @@ function findFile(sha) {
     });
 }
 
-// This code walks the history of the master branch and prints results
-// that look very similar to calling `git log` from the command line
-
-function compileHistory(resultingArrayOfCommits) {
-  var lastSha;
-  if (historyCommits.length > 0) {
-    lastSha = historyCommits[historyCommits.length - 1].commit.sha();
-    if (
-      resultingArrayOfCommits.length == 1 &&
-      resultingArrayOfCommits[0].commit.sha() == lastSha
-    ) {
-      return;
-    }
-  }
-
-  resultingArrayOfCommits.forEach(function(entry) {
-    historyCommits.push(entry);
-  });
-  lastSha = historyCommits[historyCommits.length - 1].commit.sha();
-
-  walker = repo.createRevWalk();
-  walker.push(lastSha);
-  walker.sorting(nodegit.Revwalk.SORT.TIME);
-
-  return walker.fileHistoryWalk(screenshotName, 500).then(compileHistory);
-}
-
 nodegit.Repository
   .open(path.resolve(directoryName, ".git"))
   .then(function(r) {
     repo = r;
-    return repo.getHeadCommit();
-  })
-  .then(function(firstCommitOnMaster) {
     walker = repo.createRevWalk();
-    walker.push(firstCommitOnMaster.sha());
-    walker.sorting(nodegit.Revwalk.SORT.Time);
+    walker.sorting(nodegit.Revwalk.SORT.TIME);
+    return repo.getReferences(nodegit.Reference.TYPE.OID);
+  })
+  .then(refs => {
+
+    refs.filter(ref => ref.isBranch()).forEach(ref => {
+      walker.pushRef(ref.name());
+    });
 
     return walker.fileHistoryWalk(screenshotName, 500);
   })
-  .then(compileHistory)
-  .then(function() {
-    historyCommits.forEach(function(entry) {
+  .then(function(walkedCommits) {
+    walkedCommits.forEach(function(entry) {
       commit = entry.commit;
       findFile(commit.sha());
     });
-    let page = buildPage(historyCommits);
-    let outputFileName = tempDirName+"/index.html";
+
+    let page = buildPage(walkedCommits);
+
+    let outputFileName = tempDirName + "/index.html";
     fs.writeFileSync(outputFileName, page);
-    exec('open '+ outputFileName);
+    exec("open " + outputFileName);
   })
   .done();
