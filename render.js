@@ -2,20 +2,21 @@ let nodegit = require("nodegit"),
   path = require("path"),
   fs = require("fs"),
   os = require("os"),
+  exec = require("child_process").exec,
   walker,
   historyCommits = [],
   commit,
   repo;
 
 let { screenshotName } = require("./commit.js");
-let styles = require('./main.css.js');
+let styles = require("./main.css.js");
 let directoryName = process.cwd();
 
 let tempDirName = fs.mkdtempSync(
   path.join(os.tmpdir(), "/") + "gitsnaps-" + path.parse(directoryName).base
 );
 
-console.log(tempDirName);
+// console.log(tempDirName);
 
 function buildName(sha) {
   let name = "snap-" + sha + ".png";
@@ -44,7 +45,7 @@ function buildPage(commitList) {
 }
 
 function saveFile(blob, sha) {
-  console.log(buildName(sha))
+  // console.log(buildName(sha));
   fs.writeFileSync(buildName(sha), blob.content());
 }
 
@@ -107,21 +108,18 @@ nodegit.Repository
     walker = repo.createRevWalk();
     walker.push(firstCommitOnMaster.sha());
     walker.sorting(nodegit.Revwalk.SORT.Time);
-    
+
     return walker.fileHistoryWalk(screenshotName, 500);
   })
   .then(compileHistory)
   .then(function() {
     historyCommits.forEach(function(entry) {
-      //   console.log(entry);
       commit = entry.commit;
-      // console.log("commit " + commit.sha());
       findFile(commit.sha());
-      // console.log("Date:", commit.date());
-      // console.log(commit.message());
     });
     let page = buildPage(historyCommits);
-    console.log(page);
-    fs.writeFileSync('index.html', page);
+    let outputFileName = tempDirName+"/index.html";
+    fs.writeFileSync(outputFileName, page);
+    exec('open '+ outputFileName);
   })
   .done();
