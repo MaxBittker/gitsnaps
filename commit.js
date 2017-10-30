@@ -51,7 +51,7 @@ function writecommit() {
         "HEAD",
         signature,
         signature,
-        "[screenshot]",
+        "[snapshot]",
         oid,
         [parent]
       );
