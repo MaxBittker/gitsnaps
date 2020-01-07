@@ -31,7 +31,7 @@ function buildPage(commitList) {
       let sha = entry.commit.sha();
       return `<div class="snap">
       <img src="file:///${buildName(sha)}"/>
-      <pre>${sha}</pre>
+      <pre>git checkout ${sha}</pre>
 </div>`;
     })
     .join("\n");

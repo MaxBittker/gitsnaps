@@ -6,23 +6,29 @@ module.exports = `.content{
     padding: 20px;
 }
 
+body{
+    background-color: #eee;
+}
 .snap{
     border: 1px solid black;
     margin: 5px;
     display: flex;
+    background-color: #fff;
+
     flex-direction: column;
     justify-content: space-between;
 }
 
 pre{
-    margin-left: 20px;
+    margin-left: 5px;
+    font-size:10px;
     text-decoration-line: underline;
     text-decoration-style: wavy;
-    text-decoration-color: gainsboro;
+    text-decoration-color: blue;
 }
 
 img{
     max-width: 350px;
 }
 
-`
+`;
