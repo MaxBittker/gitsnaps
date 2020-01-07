@@ -4,14 +4,15 @@ let path = require("path");
 let _ = require("lodash");
 let promisify = require("promisify-node");
 let pfs = promisify(require("fs"));
-let p = "/Users/maxbittker/Dropbox (Sentry)/Screenshots";
+let p = "/home/max/Pictures";
 
-let {screenshotLocation} = require("./commit.js");
+let { screenshotLocation } = require("./commit.js");
 
 function getNewest() {
   return new Promise(function(resolve, reject) {
     fs.readdir(p, (err, files) => {
-      let i, totalSizeBytes = 0;
+      let i,
+        totalSizeBytes = 0;
       if (err) throw err;
 
       file_opens = files.map(file =>

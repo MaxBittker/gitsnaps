@@ -30,7 +30,7 @@ function buildPage(commitList) {
     .map(entry => {
       let sha = entry.commit.sha();
       return `<div class="snap">
-      <img src="file:///private${buildName(sha)}"/>
+      <img src="file:///${buildName(sha)}"/>
       <pre>${sha}</pre>
 </div>`;
     })
@@ -53,8 +53,7 @@ function saveFile(blob, sha) {
 function findFile(sha) {
   let _entry;
   let _commit;
-  nodegit.Repository
-    .open(path.resolve(directoryName, ".git"))
+  nodegit.Repository.open(path.resolve(directoryName, ".git"))
     .then(function(repo) {
       return repo.getCommit(sha);
     })
@@ -72,8 +71,7 @@ function findFile(sha) {
     });
 }
 
-nodegit.Repository
-  .open(path.resolve(directoryName, ".git"))
+nodegit.Repository.open(path.resolve(directoryName, ".git"))
   .then(function(r) {
     repo = r;
     walker = repo.createRevWalk();
@@ -81,10 +79,11 @@ nodegit.Repository
     return repo.getReferences(nodegit.Reference.TYPE.OID);
   })
   .then(refs => {
-
-    refs.filter(ref => ref.isBranch()).forEach(ref => {
-      walker.pushRef(ref.name());
-    });
+    refs
+      .filter(ref => ref.isBranch())
+      .forEach(ref => {
+        walker.pushRef(ref.name());
+      });
 
     return walker.fileHistoryWalk(screenshotName, 500);
   })
@@ -98,6 +97,6 @@ nodegit.Repository
 
     let outputFileName = tempDirName + "/index.html";
     fs.writeFileSync(outputFileName, page);
-    exec("open " + outputFileName);
+    exec("google-chrome-stable " + outputFileName);
   })
   .done();
