@@ -1,6 +1,10 @@
 # gitsnaps
 
-visual source control tool for creative coding
+visual source control tool for lazy creative coding
+
+features:
+no need to add files or think of commit messages
+browse git history by thumbnails and SHA
 
 ![png](output.png)
 
