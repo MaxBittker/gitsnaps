@@ -13,7 +13,9 @@ setup:
 
 ```
 npm install
-# in bashrc:  (lol)
-alias gsnap="/home/max/.nvm/versions/node/v8.16.1/bin/node /home/max/workspace/gitsnaps/index.js"
-alias gview="/home/max/.nvm/versions/node/v8.16.1/bin/node /home/max/workspace/gitsnaps/render.js"
+# in bashrc:
+alias gsnap="node ~/path_to/gitsnaps/index.js"
+alias gview="node ~/path_to/gitsnaps/render.js"
 ```
+
+note: for something breaks on node 10, use node 8
