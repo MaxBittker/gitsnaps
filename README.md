@@ -2,6 +2,8 @@
 
 visual source control tool for creative coding
 
+![png](output.png)
+
 # usage:
 
 `gsnap` to commit last screenshot & all files

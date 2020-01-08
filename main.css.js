@@ -21,10 +21,10 @@ body{
 
 pre{
     margin-left: 5px;
-    font-size:10px;
+    font-size:14px;
     text-decoration-line: underline;
-    text-decoration-style: wavy;
-    text-decoration-color: blue;
+    text-decoration-style: dashed;
+    // text-decoration-color: blue;
 }
 
 img{
